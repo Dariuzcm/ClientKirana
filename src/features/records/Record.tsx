@@ -1,8 +1,8 @@
 export interface Record {
-  keys(): ['name', 'email', 'phone'];
-  id: number;
+  id?: number;
   name: string;
   email: string;
   phone: string;
-  creation: Date;
+  created_at?: any;
+  updated_at?: any;
 };

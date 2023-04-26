@@ -1,23 +1,39 @@
-import { useSelector } from "react-redux";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Popup, Table } from "semantic-ui-react";
 import { RootState } from "../../app/store";
 import { isPhoneNumber, isEmail } from "../../util/util";
-import { Record } from './Record'
+import { heartBeat, setContactCount, setDuplicatedCount } from "./recordSlice";
 
 export default function RecordTable() {
-  const { records } = useSelector((state: RootState) => state.record);
+  const { records, duplicatedCount, contanctCount } = useSelector((state: RootState) => state.record);
+  const dispatch = useDispatch<any>()
+
+  useEffect(() => {
+    setInterval(() => dispatch(heartBeat()), 8000)
+  }, [])
 
   const RecordBody = () => {
-    const recordsMapped = records.map((item: Record) => {
-      const keys = item.keys();
+    let contacts = records.map((item => item.name));
+
+    let contactCount: string[] = []
+
+    for (const con of contacts) {
+      if (!contactCount.includes(con)) {
+        contactCount.push(con)
+      }
+    }
+    
+    dispatch(setContactCount(contactCount.length))
+    const recordsMapped = records.map((item: any) => {
+      const keys: any[] = Object.keys(item);
       let duplicated = []
       for (const key of keys) {
-        let finded = records.filter((rec: Record) => rec[key] === item[key]).length;
-        if (finded > 1) {
+        let finded = records.filter((rec: any) => rec[key] === item[key]).length;
+        if (finded > 1 && ['name','phone','email'].includes(key)) {
           duplicated.push(key)
         }
       }
-
       return {
         name: item.name,
         phone: item.phone,
@@ -29,6 +45,7 @@ export default function RecordTable() {
       }
     })
 
+    dispatch(setDuplicatedCount(recordsMapped.filter( item => item.duplicated.length > 0 ).length))
     return (
       <>
         {
@@ -36,21 +53,21 @@ export default function RecordTable() {
             return (
               <>
                 <Table.Row>
-                  <Table.Cell 
-                    style={record.duplicated.includes('name')? { color: 'red'}: null}>
+                  <Table.Cell
+                    style={record.duplicated.includes('name') ? { color: 'red' } : null}>
                     {record.name}
                   </Table.Cell>
-                  <Table.Cell 
-                    style={record.duplicated.includes('email')? { color: 'red'}: null}
-                    warning={record.emailIsValid}
-                    >
-                    {record.emailIsValid ? record.email : <Popup on={'hover'} content='Invalid email' trigger={<p>{record.email}</p>}/>}
+                  <Table.Cell
+                    style={record.duplicated.includes('email') ? { color: 'red' } : null}
+                    warning={!record.emailIsValid}
+                  >
+                    {record.emailIsValid ? record.email : <Popup on={'hover'} content='Invalid email' trigger={<p>{record.email}</p>} />}
                   </Table.Cell>
-                  <Table.Cell 
-                    style={record.duplicated.includes('phone')? { color: 'red'}: null}
-                    warning={record.phoneIsValid}
-                    >
-                    {record.phoneIsValid ? record.phone : <Popup on={'hover'} content='Invalid phone' trigger={<p>{record.phone}</p>}/>}
+                  <Table.Cell
+                    style={record.duplicated.includes('phone') ? { color: 'red' } : null}
+                    warning={!record.phoneIsValid}
+                  >
+                    {record.phoneIsValid ? record.phone : <Popup on={'hover'} content='Invalid phone' trigger={<p>{record.phone}</p>} />}
                   </Table.Cell>
                 </Table.Row>
               </>
@@ -61,6 +78,15 @@ export default function RecordTable() {
     )
   }
   return (<>
+     <div>
+      Datos Duplicados : {duplicatedCount}
+    </div>
+    <div style={{paddingLeft: '3rem'}}>
+      Contactos : {contanctCount}
+    </div>
+    <div style={{paddingLeft: '3rem'}}>
+      Registros : {records.length}
+    </div>
     <Table celled>
       <Table.Header>
         <Table.Row>
@@ -74,3 +100,4 @@ export default function RecordTable() {
   </>
   );
 }
+

@@ -1,10 +1,10 @@
 
-export function isPhoneNumber (value: string) {
+export function isPhoneNumber (value: any) {
   const reg = new RegExp(/^[(]{0,1}[0-9]{3}[)]{0,1}[-\s./]{0,1}[0-9]{3}[-\s./]{0,1}[0-9]{4}$/)
   return reg.test(value)
 }
 
-export function isEmail (value: string) {
+export function isEmail (value: any) {
   const reg = new RegExp(/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(.\w{2,3})+$/)
   return reg.test(value);
 }
