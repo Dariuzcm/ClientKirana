@@ -1,7 +1,14 @@
-const csv = require('csvtojson');
+import csv from 'csvtojson';
 
 export async function getJsonCSV(file:any){
-  const json = await csv.fromString(file);
-  console.log(json)
-  return json;
+  const csvO = csv()
+  const json = await csvO.fromString(file);
+  const mapped = json.map(item => {
+    return {
+      name: item["Nombre"],
+      email: item["Correo Electronico"],
+      phone: item["Telefono"],
+    }
+  })
+  return mapped;
 }

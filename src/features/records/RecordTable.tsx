@@ -68,7 +68,7 @@ export default function RecordTable() {
           <Table.HeaderCell>Email</Table.HeaderCell>
           <Table.HeaderCell>Phone</Table.HeaderCell>
         </Table.Row>
-        {records.length > 0 ? <RecordBody /> : <p> Not Record Allowed</p>}
+        {records.length > 0 ? <RecordBody /> : "No Records available"}
       </Table.Header>
     </Table>
   </>
